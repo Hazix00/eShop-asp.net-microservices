@@ -7,12 +7,16 @@ namespace Catalog.API.Data
     {
         public IMongoCollection<Product> Products { get; }
 
-        public CatalogContext(IConfiguration configuration)
+        public CatalogContext(IConfiguration configuration, ILogger<CatalogContext> logger)
         {
-            var client = new MongoClient(configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
-            var database = client.GetDatabase(configuration.GetValue<string>("DatabaseSettings:DatabaseName"));
+            var conStr = configuration.GetValue<string>("DatabaseSettings:ConnectionString");
+            var dbName = configuration.GetValue<string>("DatabaseSettings:DatabaseName");
+            var collectName = configuration.GetValue<string>("DatabaseSettings:CollectionName");
 
-            Products = database.GetCollection<Product>(configuration.GetValue<string>("DatabaseSettings:CollectionName"));
+            var client = new MongoClient(conStr);
+            var database = client.GetDatabase(dbName);
+
+            Products = database.GetCollection<Product>(collectName);
             CatalogContextSeed.SeedData(Products);
         }
     }
